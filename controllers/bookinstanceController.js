@@ -53,9 +53,9 @@ exports.bookinstance_detail = (req, res, next) => {
                     },
                     imprint: bookInstance.imprint,
                     status: bookInstance.status,
-                    due_back: moment(bookInstance.due_back).format(
-                        "YYYY-MM-DD"
-                    ),
+                    due_back: bookInstance.due_back
+                        ? moment(bookInstance.due_back).format("YYYY-MM-DD")
+                        : "",
                 },
             });
         });
@@ -67,6 +67,7 @@ exports.bookinstance_create_post = [
     body("book", "Book must be specified").trim().isLength({ min: 1 }),
     body("imprint", "Imprint must be specified").trim().isLength({ min: 1 }),
     body("due_back", "Invalid date").optional({ checkFalsy: true }).isISO8601(),
+    body("status", "Invalid Status").trim().isLength({ min: 1 }),
 
     // Sanitize fields.
     sanitizeBody("book").escape(),

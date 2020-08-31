@@ -60,9 +60,11 @@ exports.author_detail = (req, res, next) => {
                     date_of_birth: moment(results.author.date_of_birth).format(
                         "YYYY-MM-DD"
                     ),
-                    date_of_death: moment(results.author.date_of_death).format(
-                        "YYYY-MM-DD"
-                    ),
+                    date_of_death: results.author.date_of_death
+                        ? moment(results.author.date_of_death).format(
+                              "YYYY-MM-DD"
+                          )
+                        : "",
                     lifespan: results.author.lifespan,
                 },
                 author_books: results.authors_books.map((book) => {
@@ -92,9 +94,7 @@ exports.author_create_post = [
         .withMessage("Last name must be specified.")
         .isAlphanumeric()
         .withMessage("Last name has non-alphanumeric characters."),
-    body("date_of_birth", "Invalid date of birth")
-        .optional({ checkFalsy: true })
-        .isISO8601(),
+    body("date_of_birth", "Invalid date of birth").isISO8601(),
     body("date_of_death", "Invalid date of death")
         .optional({ checkFalsy: true })
         .isISO8601(),
@@ -118,7 +118,7 @@ exports.author_create_post = [
             date_of_death: req.body.date_of_death,
             // Create an Author object with escaped and trimmed data.date_of_death: req.body.date_of_death,
         });
-
+        console.log(errors);
         if (!errors.isEmpty()) {
             let error = {};
             errors.array().forEach((err) => {
@@ -133,9 +133,9 @@ exports.author_create_post = [
                     date_of_birth: moment(author.date_of_birth).format(
                         "YYYY-MM-DD"
                     ),
-                    date_of_death: moment(author.date_of_death).format(
-                        "YYYY-MM-DD"
-                    ),
+                    date_of_death: author.date_of_death
+                        ? moment(author.date_of_death).format("YYYY-MM-DD")
+                        : "",
                 },
                 error,
             });
@@ -155,9 +155,9 @@ exports.author_create_post = [
                         date_of_birth: moment(author.date_of_birth).format(
                             "YYYY-MM-DD"
                         ),
-                        date_of_death: moment(author.date_of_death).format(
-                            "YYYY-MM-DD"
-                        ),
+                        date_of_death: author.date_of_death
+                            ? moment(author.date_of_death).format("YYYY-MM-DD")
+                            : "",
                     },
                 });
             });
@@ -221,9 +221,7 @@ exports.author_update_post = [
         .withMessage("last name must be specified.")
         .isAlphanumeric()
         .withMessage("last name has non-alphanumeric characters."),
-    body("date_of_birth", "Invalid date of birth")
-        .optional({ checkFalsy: true })
-        .isISO8601(),
+    body("date_of_birth", "Invalid date of birth").isISO8601(),
     body("date_of_death", "Invalid date of death")
         .optional({ checkFalsy: true })
         .isISO8601(),
@@ -247,13 +245,14 @@ exports.author_update_post = [
             date_of_death: req.body.date_of_death,
             _id: req.params.id,
         });
-
         if (!errors.isEmpty()) {
             // There are errors. Render the form again with sanitized values and error messages.
+            let error = {};
             errors.array().forEach((err) => {
                 error[err.param] = err.msg;
             });
-            res.status(200).json({
+            console.log(errors);
+            res.status(400).json({
                 author: {
                     id: author._id,
                     first_name: author.first_name,
@@ -261,9 +260,9 @@ exports.author_update_post = [
                     date_of_birth: moment(author.date_of_birth).format(
                         "YYYY-MM-DD"
                     ),
-                    date_of_death: moment(author.date_of_death).format(
-                        "YYYY-MM-DD"
-                    ),
+                    date_of_death: author.date_of_death
+                        ? moment(author.date_of_death).format("YYYY-MM-DD")
+                        : "",
                 },
                 error,
             });
@@ -287,9 +286,11 @@ exports.author_update_post = [
                             date_of_birth: moment(
                                 updatedAuthor.date_of_birth
                             ).format("YYYY-MM-DD"),
-                            date_of_death: moment(
-                                updatedAuthor.date_of_death
-                            ).format("YYYY-MM-DD"),
+                            date_of_death: author.date_of_death
+                                ? moment(updatedAuthor.date_of_death).format(
+                                      "YYYY-MM-DD"
+                                  )
+                                : "",
                         },
                     });
                 });
